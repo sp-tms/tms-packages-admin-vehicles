@@ -2,60 +2,119 @@
 
 namespace Apps\Tms\Packages\Vehicles;
 
+use Apps\Tms\Packages\Vehicles\Model\AppsTmsVehicles;
 use System\Base\BasePackage;
 
 class Vehicles extends BasePackage
 {
-    //protected $modelToUse = ::class;
+    protected $modelToUse = AppsTmsVehicles::class;
 
     protected $packageName = 'vehicles';
 
     public $vehicles;
 
-    public function getVehiclesById($id)
+    public function init()
     {
-        $vehicles = $this->getById($id);
+        parent::init();
 
-        if ($vehicles) {
-            //
-            $this->addResponse('Success');
-
-            return;
-        }
-
-        $this->addResponse('Error', 1);
+        return $this;
     }
 
-    public function addVehicles($data)
+    public function getVehicle($vehicleId)
     {
-        //
-    }
+        if ($this->config->databasetype === 'db') {
+            $vehiclesObj = $this->getFirst('id', $vehicleId);
 
-    public function updateVehicles($data)
-    {
-        $vehicles = $this->getById($id);
+            if ($vehiclesObj) {
+                $vehicle = $vehiclesObj->toArray();
 
-        if ($vehicles) {
-            //
-            $this->addResponse('Success');
+                $addressObj = $vehiclesObj->getAddresses();
 
-            return;
+                $vehicle['address'] = [];
+
+                if ($addressObj) {
+                    $vehicle['address'] = $addressObj->toArray();
+                }
+
+                return $vehicle;
+            }
+        } else {
+            // $this->setFFRelations(true);
+            // $this->setFFRelationsConditions(['addresses' => ['package_name', '=', 'Companies'], 'contacts' => ['package_name', '=', 'Companies']]);
+
+            $vehicle = $this->getFirst('id', $vehicleId, false, true, null, [], true);
+
+            return $vehicle;
         }
 
-        $this->addResponse('Error', 1);
+        return false;
     }
 
-    public function removeVehicles($data)
+    public function addVehicle($data)
     {
-        $vehicles = $this->getById($id);
+        if ($this->add($data)) {
+            $vehicle = $this->packagesData->last;
 
-        if ($vehicles) {
-            //
-            $this->addResponse('Success');
+            $this->addResponse('Vehicle added');
 
-            return;
+            return true;
         }
 
-        $this->addResponse('Error', 1);
+        $this->addResponse('Error Adding Vehicle', 1);
+    }
+
+    public function updateVehicle($data)
+    {
+        if ($this->update($data)) {
+            $this->addResponse('Vehicle updated');
+
+            return true;
+        }
+
+        $this->addResponse('Error Updating Vehicle', 1);
+    }
+
+    public function removeVehicle($data)
+    {
+        $vehicle = $this->getVehicle($data['id']);
+
+        //Archive Vehicle and do not delete it!
+        $vehicle['archived'] = true;
+
+        if ($this->updateVehicle($vehicle)) {
+            $this->addResponse('Vehicle archived');
+
+            return true;
+        }
+
+        $this->addResponse('Error removing vehicle', 1);
+
+        return false;
+    }
+
+    public function getVehicleByRegistrationNo($registrationNo)
+    {
+        if ($this->config->databasetype === 'db') {
+            $params =
+                [
+                    'conditions'    => 'registration_no = :registrationNo:',
+                    'bind'          =>
+                        [
+                            'registrationNo'         => $registrationNo
+                        ]
+                ];
+        } else {
+            $params = ['conditions' => ['registration_no', '=', $registrationNo]];
+        }
+
+        $vehicle = $this->getByParams($params);
+
+        if ($vehicle && count($vehicle) > 0) {
+            $vehicle = $this->getVehicle($vehicle[0]['id']);
+
+            return $vehicle;
+        }
+
+        return false;
     }
 }
