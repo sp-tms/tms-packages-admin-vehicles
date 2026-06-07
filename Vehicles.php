@@ -117,4 +117,81 @@ class Vehicles extends BasePackage
 
         return false;
     }
+
+    public function updateDocument($data)
+    {
+        $this->setFFValidation(false);
+
+        $vehicle = $this->getById((int) $data['id']);
+
+        if (!isset($data['documents'])) {
+            $data['documents'] = [];
+        }
+        if (is_string($vehicle['documents'])) {
+            $vehicle['documents'] = $this->helper->decode($vehicle['documents'], true);
+        }
+
+        if (isset($vehicle['documents']) && count($vehicle['documents']) > 0) {
+            $vehicle['documents'] = array_replace($data['documents'], array_intersect_key($data['documents'], $vehicle['documents']));
+        } else {
+            $vehicle['documents'] = $data['documents'];
+        }
+
+        foreach ($vehicle['documents'] as $uuid => &$document) {
+            if (!isset($document['account_id'])) {
+                $document['account_id'] = 0;
+            } else {
+                $document['account_id'] = (int) $document['account_id'];
+            }
+
+            if ($document['account_id'] === 0) {
+                if ($this->access->auth->check()) {
+                    $document['account_id'] = $this->access->auth->account()['id'];
+                    $account = $this->basepackages->accounts->getAccountById($this->access->auth->account()['id']);
+
+                    if ($account && isset($account['contact']['full_name'])) {
+                        $document['account_name'] = $account['contact']['full_name'];
+                    }
+                } else {
+                    $document['account_name'] = '-';
+                }
+            }
+
+            if (!isset($document['date'])) {
+                $document['date'] = (\Carbon\Carbon::now('Asia/Kolkata'))->toAtomString();
+            }
+        }
+
+        if ($this->update($vehicle)) {
+            $this->addResponse('Added documents to vehicle', 0, ['documents' => $vehicle['documents']]);
+
+            return true;
+        }
+
+        $this->addResponse('Error while updating documents for vehicle', 1);
+
+        return false;
+    }
+
+    public function getVehicleAvailableStatus()
+    {
+        return
+            [
+                '0' =>
+                    [
+                        'id' => '0',
+                        'name'  => 'Idle'
+                    ],
+                '1' =>
+                    [
+                        'id' => '1',
+                        'name'  => 'On Trip'
+                    ],
+                '2' =>
+                    [
+                        'id' => '2',
+                        'name'  => 'At Service'
+                    ]
+            ];
+    }
 }

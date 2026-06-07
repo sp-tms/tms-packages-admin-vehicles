@@ -22,6 +22,14 @@ class Vehicles
                     ]
                 ),
                 new Column(
+                    'image',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 1024,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
                     'registration_no',
                     [
                         'type'          => Column::TYPE_VARCHAR,
@@ -29,12 +37,11 @@ class Vehicles
                         'notNull'       => true,
                     ]
                 ),
-                new Column(
-                    'vehicle_type',
+                new Column(//Self Company ID
+                    'organisation_id',
                     [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 50,
-                        'notNull'       => false,
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => true,
                     ]
                 ),
                 new Column(
@@ -48,7 +55,7 @@ class Vehicles
                     'make',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 20,
+                        'size'          => 50,
                         'notNull'       => false,
                     ]
                 ),
@@ -56,7 +63,15 @@ class Vehicles
                     'model',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 20,
+                        'size'          => 50,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'vehicle_type',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 50,
                         'notNull'       => false,
                     ]
                 ),
@@ -71,7 +86,7 @@ class Vehicles
                     'euro_norms',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 20,
+                        'size'          => 50,
                         'notNull'       => false,
                     ]
                 ),
@@ -93,6 +108,14 @@ class Vehicles
                     'capacity_uom',
                     [
                         'type'          => Column::TYPE_SMALLINTEGER,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'purchase_date',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 50,
                         'notNull'       => false,
                     ]
                 ),
@@ -175,7 +198,8 @@ class Vehicles
             new Index(
                 'column_INDEX',
                 [
-                    'registration_no'
+                    'registration_no',
+                    'archived'
                 ],
                 'INDEX'
             )

@@ -8,15 +8,19 @@ class AppsTmsVehicles extends BaseModel
 {
     public $id;
 
+    public $image;
+
     public $registration_no;
 
-    public $vehicle_type;
+    public $organisation_id;
 
     public $company_id;
 
     public $make;
 
     public $model;
+
+    public $vehicle_type;
 
     public $manufacturing_year;
 
