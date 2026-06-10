@@ -55,6 +55,8 @@ class Vehicles extends BasePackage
         if ($this->add($data)) {
             $vehicle = $this->packagesData->last;
 
+            $this->addActivityLog($vehicle);
+
             $this->addResponse('Vehicle added');
 
             return true;
@@ -66,7 +68,11 @@ class Vehicles extends BasePackage
     public function updateVehicle($data)
     {
         if ($this->update($data)) {
+            $vehicle = $this->packagesData->last;
+
             $this->addResponse('Vehicle updated');
+
+            $this->addActivityLog($data, $vehicle);
 
             return true;
         }
