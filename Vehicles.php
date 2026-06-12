@@ -52,6 +52,12 @@ class Vehicles extends BasePackage
 
     public function addVehicle($data)
     {
+        if (!checkCtype($data['registration_no'], 'alnum', [' ', '/', '-'], false)) {//Ignore Special chars
+            $this->addResponse('Registration No can only have letters, numbers, spaces, dash (-) and slash (/) characters.');
+
+            return false;
+        }
+
         if ($this->add($data)) {
             $vehicle = $this->packagesData->last;
 
@@ -67,6 +73,12 @@ class Vehicles extends BasePackage
 
     public function updateVehicle($data)
     {
+        if (!checkCtype($data['registration_no'], 'alnum', [' ', '/', '-'], false)) {//Ignore Special chars
+            $this->addResponse('Registration No can only have letters, numbers, spaces, dash (-) and slash (/) characters.', 1);
+
+            return false;
+        }
+
         if ($this->update($data)) {
             $vehicle = $this->packagesData->last;
 
@@ -183,19 +195,19 @@ class Vehicles extends BasePackage
     {
         return
             [
-                '0' =>
-                    [
-                        'id' => '0',
-                        'name'  => 'Idle'
-                    ],
                 '1' =>
                     [
                         'id' => '1',
-                        'name'  => 'On Trip'
+                        'name'  => 'Idle'
                     ],
                 '2' =>
                     [
                         'id' => '2',
+                        'name'  => 'On Trip'
+                    ],
+                '3' =>
+                    [
+                        'id' => '3',
                         'name'  => 'At Service'
                     ]
             ];
