@@ -39,9 +39,6 @@ class Vehicles extends BasePackage
                 return $vehicle;
             }
         } else {
-            // $this->setFFRelations(true);
-            // $this->setFFRelationsConditions(['addresses' => ['package_name', '=', 'Companies'], 'contacts' => ['package_name', '=', 'Companies']]);
-
             $vehicle = $this->getFirst('id', $vehicleId, false, true, null, [], true);
 
             return $vehicle;
