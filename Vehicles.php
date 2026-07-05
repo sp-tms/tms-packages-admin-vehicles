@@ -58,6 +58,11 @@ class Vehicles extends BasePackage
         if ($this->add($data)) {
             $vehicle = $this->packagesData->last;
 
+            if ($data['image'] !== '') {
+                $this->basepackages->storages->changeOrphanStatus(newUUID : $data['image'], status: 0);
+                $this->basepackages->storages->updatePackageInfo($data['image'], $vehicle['id']);
+            }
+
             $this->addActivityLog($vehicle);
 
             $this->addResponse('Vehicle added');
@@ -78,6 +83,11 @@ class Vehicles extends BasePackage
 
         if ($this->update($data)) {
             $vehicle = $this->packagesData->last;
+
+            if ($data['image'] !== '') {
+                $this->basepackages->storages->changeOrphanStatus(newUUID : $data['image'], status: 0);
+                $this->basepackages->storages->updatePackageInfo($data['image'], $vehicle['id']);
+            }
 
             $this->addResponse('Vehicle updated');
 
